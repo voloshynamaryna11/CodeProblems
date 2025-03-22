@@ -1,23 +1,45 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class BreadthFirstSearch {
+
+    // Given the head of a linked list, return the node where the cycle begins. If there is no cycle, return null.
+    //
+    //There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer.
+    // Internally, pos is used to denote the index of the node that tail's next pointer is connected to (0-indexed). It is -1 if there is no cycle.
+    // Note that pos is not passed as a parameter.
+    public ListNode detectCycle(ListNode head) {
+        List<ListNode> listNodes = new ArrayList<>();
+        while(!listNodes.contains(head) || head != null) {
+            listNodes.add(head);
+            head = head.next;
+            if(head != null) {
+                if(listNodes.contains(head)) {
+                    return head;
+                }
+            }
+        }
+
+        return null;
+    }
 
     //Just simple go through with this method
     static void breadthSearch(TreeNode treeNode) {
         Queue<TreeNode> treeNodes = new PriorityQueue<>();
         treeNodes.add(treeNode);
 
-        while(!treeNodes.isEmpty()) {
+        while (!treeNodes.isEmpty()) {
             TreeNode peek = treeNodes.poll();
             System.out.println(peek.val);
-            if(peek.right != null) {
+            if (peek.right != null) {
                 treeNodes.add(peek.right);
             }
 
-            if(peek.left != null) {
+            if (peek.left != null) {
                 treeNodes.add(peek.left);
             }
         }
@@ -37,6 +59,16 @@ public class BreadthFirstSearch {
         @Override
         public int compareTo(TreeNode o) {
             return Integer.compare(this.val, o.val);
+        }
+    }
+
+    class ListNode {
+        int val;
+        ListNode next;
+
+        ListNode(int x) {
+            val = x;
+            next = null;
         }
     }
 

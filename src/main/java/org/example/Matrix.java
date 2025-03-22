@@ -1,12 +1,52 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Matrix {
+
+    // You are given a 0-indexed integer array arr, and an m x n integer matrix mat. arr and mat both contain all the integers in the range [1, m * n].
+    //
+    //Go through each index i in arr starting from index 0 and paint the cell in mat containing the integer arr[i].
+    //
+    //Return the smallest index i at which either a row or a column will be completely painted in mat.
+    public static int firstCompleteIndex(int[] arr, int[][] mat) {
+        Map<Integer, Integer> countRawsMap = new HashMap<>();
+        Map<Integer, Integer> countColumnsMap = new HashMap<>();
+        Map<Integer, List<Integer>> indexesMap = new HashMap<>();
+
+
+        for (int i = 0; i < mat.length; i++) {
+            countRawsMap.put(i, 0);
+            for (int j = 0; j < mat[0].length; j++) {
+              indexesMap.put(mat[i][j], List.of(i, j));
+              countColumnsMap.put(j, 0);
+            }
+        }
+
+        for (int i = 0; i < arr.length; i++) {
+            List<Integer> integers = indexesMap.get(arr[i]);
+            Integer rawIndex = integers.get(0);
+            Integer columnIndex = integers.get(1);
+
+            int incrementedColumns = countColumnsMap.get(columnIndex) + 1;
+            int incrementedRaws = countRawsMap.get(rawIndex) + 1;
+
+            if(incrementedColumns >= mat.length || incrementedRaws >= mat[0].length) {
+                return i;
+            }
+
+            countRawsMap.put(rawIndex, incrementedRaws);
+            countColumnsMap.put(columnIndex, incrementedColumns);
+        }
+
+        return 0;
+    }
 
     // Given an m x n integer matrix matrix, if an element is 0, set its entire row and column to 0's.
     //

@@ -1,9 +1,51 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Recursive {
+
+    // You are given two positive integers n and k. There are n children numbered from 0 to n - 1 standing in a queue in order from left to right.
+    //
+    //Initially, child 0 holds a ball and the direction of passing the ball is towards the right direction. After each second, the child holding the ball passes it to the child next to them. Once the ball reaches either end of the line, i.e. child 0 or child n - 1, the direction of passing is reversed.
+    //
+    //Return the number of the child who receives the ball after k seconds.
+    //
+    //
+    //
+    //Example 1:
+    //
+    //Input: n = 3, k = 5
+    //
+    //Output: 1
+    //
+    //Explanation:
+    //
+    //Time elapsed	Children
+    //0	[0, 1, 2]
+    //1	[0, 1, 2]
+    //2	[0, 1, 2]
+    //3	[0, 1, 2]
+    //4	[0, 1, 2]
+    //5	[0, 1, 2]
+    public static int numberOfChild(int n, int k) {
+       return help(n, 0, k, true);
+    }
+
+    static int help(int n, int m, int k, boolean flag) {
+        if(k == 0) {
+            return m;
+        }
+
+        if(m == n - 1) {
+            flag = false;
+        }
+
+        if(m == 0)
+        {
+            flag = true;
+        }
+
+        return flag ? help(n, m+1, k-1, flag) : help(n, m-1, k-1, flag);
+    }
+
     static void printArrayElements(int[] array) {
         if (array.length == 1) {
             System.out.println(array[0]);
@@ -75,79 +117,6 @@ public class Recursive {
             this.value = value;
             this.left = left;
             this.right = right;
-        }
-    }
-
-    public static void main(String[] args) {
-//        BinaryTreeNode node9 = new BinaryTreeNode(9);
-//        BinaryTreeNode node8 = new BinaryTreeNode(8);
-//        BinaryTreeNode node15 = new BinaryTreeNode(15);
-//        BinaryTreeNode node1 = new BinaryTreeNode(1);
-//
-//        BinaryTreeNode node5 = new BinaryTreeNode(5, node8, node9);
-//        BinaryTreeNode node3 = new BinaryTreeNode(3, node1, node15);
-//        BinaryTreeNode node11 = new BinaryTreeNode(1, node3, node5);
-
-        BinaryTreeNode node5 = new BinaryTreeNode(5, null, null);
-        BinaryTreeNode node3 = new BinaryTreeNode(3, null, null);
-        BinaryTreeNode node11 = new BinaryTreeNode(1, node3, node5);
-
-        BinaryTreeNode binaryTreeNode = fillBinaryTree(7, node11);
-
-        printTree(node11);
-    }
-
-    public static void printTree(BinaryTreeNode root) {
-        List<List<String>> lines = new ArrayList<>();
-        List<BinaryTreeNode> level = new ArrayList<>();
-        List<BinaryTreeNode> next = new ArrayList<>();
-
-        level.add(root);
-        int nodeCount = 1;
-        int widest = 0;
-
-        while (nodeCount > 0) {
-            List<String> line = new ArrayList<>();
-            nodeCount = 0;
-
-            for (BinaryTreeNode node : level) {
-                if (node == null) {
-                    line.add(" ");
-                    next.add(null);
-                    next.add(null);
-                } else {
-                    String value = String.valueOf(node.value);
-                    line.add(value);
-                    if (value.length() > widest) {
-                        widest = value.length();
-                    }
-                    next.add(node.left);
-                    next.add(node.right);
-                    if (node.left != null) nodeCount++;
-                    if (node.right != null) nodeCount++;
-                }
-            }
-
-            if (widest % 2 == 1) widest++;
-            lines.add(line);
-            List<BinaryTreeNode> temp = level;
-            level = next;
-            next = temp;
-            next.clear();
-        }
-
-        int perPiece = lines.get(lines.size() - 1).size() * (widest + 4);
-        for (int i = 0; i < lines.size(); i++) {
-            List<String> line = lines.get(i);
-            int half = perPiece / 2 - 1;
-            for (int j = 0; j < line.size(); j++) {
-                String f = line.get(j);
-                if (f.equals(" ")) f = " ".repeat(widest);
-                int gap = half - f.length() / 2;
-                System.out.print(" ".repeat(gap) + f + " ".repeat(gap));
-            }
-            System.out.println();
-            perPiece /= 2;
         }
     }
 }

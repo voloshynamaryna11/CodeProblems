@@ -3,8 +3,6 @@ package org.example;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.System.out;
-
 public class DynamicProgramming {
 
     // Find the longest subsequence in array. Return its length
@@ -14,7 +12,7 @@ public class DynamicProgramming {
         //find max of it and + 1
         //go next
 
-        if(nums.length == 1) {
+        if (nums.length == 1) {
             return 1;
         }
 
@@ -24,7 +22,7 @@ public class DynamicProgramming {
         int theLis = findTheLis(currentIndex, nums, map);
         map.put(currentIndex, theLis);
         for (int i = 0; i < nums.length; i++) {
-            if(!map.containsKey(i)) {
+            if (!map.containsKey(i)) {
                 findTheLis(i, nums, map);
             }
         }
@@ -32,17 +30,17 @@ public class DynamicProgramming {
     }
 
     private static int findTheLis(int currentIndex, int[] nums, Map<Integer, Integer> map) {
-        if(currentIndex == 0) {
+        if (currentIndex == 0) {
             return 1;
         }
 
-        if(map.containsKey(currentIndex)){
+        if (map.containsKey(currentIndex)) {
             return map.get(currentIndex);
         }
 
         int max = 0;
         for (int i = currentIndex; i >= 0; i--) {
-            if(nums[i] < nums[currentIndex]) {
+            if (nums[i] < nums[currentIndex]) {
                 max = Math.max(max, findTheLis(i, nums, map));
             }
         }
@@ -63,8 +61,12 @@ public class DynamicProgramming {
 //1. 1 step + 1 step
 //2. 2 steps
     public static int climbStairs(int n) {
-        if (n == 1) return 1;
-        if (n == 2) return 2;
+        if (n == 1) {
+            return 1;
+        }
+        if (n == 2) {
+            return 2;
+        }
 
         int prev1 = 1, prev2 = 2;
         for (int i = 3; i <= n; i++) {
@@ -75,12 +77,15 @@ public class DynamicProgramming {
         return prev2;
     }
 
+    // Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
+    // A subsequence of a string is a new string that is formed from the original string by deleting
+    // some (can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
     public static boolean isSubsequence(String s, String t) {
-        if(s == null || s.isEmpty()) {
+        if (s == null || s.isEmpty()) {
             return true;
         }
 
-        if(s.length() == 1 && t.contains(s)) {
+        if (s.length() == 1 && t.contains(s)) {
             return true;
         }
 
@@ -90,7 +95,47 @@ public class DynamicProgramming {
         return t.contains(currentString) && isSubsequence(s.substring(1), substringOfT);
     }
 
+    public static int minOperation(int n) {
+        if (n == 0) {
+            return 0;
+        }
+
+        if (isPowerOfTwo(n)) {
+            return (int) (Math.log(n) / Math.log(2)) + 1;
+        }
+
+        if(n % 2 == 1) {
+            return 1 + minOperation(n -1);
+        }
+
+        return minOperation(n/2) + 1;
+    }
+
+    public static boolean isPowerOfTwo(int num) {
+        if (num <= 0) {
+            return false;
+        }
+        double logBase2 = Math.log(num) / Math.log(2);
+        return logBase2 == Math.floor(logBase2);
+    }
+
+    // There is a robot on an m x n grid. The robot is initially located at the top-left corner (i.e., grid[0][0]).
+    // The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]).
+    // The robot can only move either down or right at any point in time.
+    //
+    //Given the two integers m and n, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+    public static int uniquePaths(int m, int n) {
+        if(m == 1 && n == 1) {
+            return 1;
+        }
+        if(m <= 0 || n <= 0) {
+            return 0;
+        }
+
+        return uniquePaths(m - 1, n) + uniquePaths(m, n - 1);
+    }
+
     public static void main(String[] args) {
-        out.println(isSubsequence("aaaaaa", "bbaaaa"));
+        System.out.println(uniquePaths(3, 7));
     }
 }

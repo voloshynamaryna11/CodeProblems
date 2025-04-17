@@ -3,20 +3,25 @@ package org.example;
 public class InplaceReversalOfLinkedList {
 
     public static void main(String[] args) {
-        ListNode node7 = new ListNode(7);
-        ListNode node6 = new ListNode(6, node7);
-        ListNode node5 = new ListNode(5, node6);
-        ListNode node4 = new ListNode(4, node5);
-        ListNode node3 = new ListNode(3, node4);
-        ListNode node2 = new ListNode(2, node3);
-        ListNode node = new ListNode(1, node2);
+//        ListNode node7 = new ListNode(7);
+//        ListNode node6 = new ListNode(6, node7);
+//        ListNode node5 = new ListNode(5, node6);
+//        ListNode node4 = new ListNode(4, node5);
+//        ListNode node3 = new ListNode(3, node4);
+//        ListNode node2 = new ListNode(2, node3);
+//        ListNode node = new ListNode(1, node2);
+//
+//        ListNode reverseLinkedList = reverseBetween1(node, 1, 7);
+//
+//        while (reverseLinkedList != null) {
+//            System.out.println(reverseLinkedList.toString());
+//            reverseLinkedList = reverseLinkedList.next;
+//        }
 
-        ListNode reverseLinkedList = reverseBetween1(node, 1, 7);
+        ListNode node2 = new ListNode(2);
+        ListNode node1 = new ListNode(1, node2);
 
-        while (reverseLinkedList != null) {
-            System.out.println(reverseLinkedList.toString());
-            reverseLinkedList = reverseLinkedList.next;
-        }
+        removeNthFromEnd(node1, 1);
     }
 
     //Example of how to reverse LinkedList
@@ -103,7 +108,7 @@ public class InplaceReversalOfLinkedList {
             ListNode currentMiddle = firstPart;
             ListNode previous = lastPart;
             ListNode temp = null;
-            while (i < right ) {
+            while (i < right) {
                 temp = currentMiddle.next;
                 currentMiddle.next = previous;
                 previous = currentMiddle;
@@ -134,6 +139,39 @@ public class InplaceReversalOfLinkedList {
             i++;
         }
 
+        return head;
+    }
+
+
+    // Given the head of a linked list, remove the nth node from the end of the list and return its head
+    public static ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode fastHead = head;
+        ListNode slowNode = head;
+
+        int currentNumberOfIteration = 0;
+        int totalSize = 0;
+
+        while (fastHead.next != null) {
+            fastHead = fastHead.next;
+            currentNumberOfIteration++;
+            totalSize++;
+            if (currentNumberOfIteration > n) {
+                slowNode = slowNode.next;
+            }
+        }
+
+        ListNode nodeForDeletion = slowNode.next;
+
+        if (nodeForDeletion == null && n==1) {
+            head = null;
+            return head;
+        }
+
+        if(n == totalSize) {
+            return head.next;
+        }
+
+        slowNode.next = nodeForDeletion.next;
         return head;
     }
 }

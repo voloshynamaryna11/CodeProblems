@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Matrix {
@@ -20,12 +21,11 @@ public class Matrix {
         Map<Integer, Integer> countColumnsMap = new HashMap<>();
         Map<Integer, List<Integer>> indexesMap = new HashMap<>();
 
-
         for (int i = 0; i < mat.length; i++) {
             countRawsMap.put(i, 0);
             for (int j = 0; j < mat[0].length; j++) {
-              indexesMap.put(mat[i][j], List.of(i, j));
-              countColumnsMap.put(j, 0);
+                indexesMap.put(mat[i][j], List.of(i, j));
+                countColumnsMap.put(j, 0);
             }
         }
 
@@ -37,7 +37,7 @@ public class Matrix {
             int incrementedColumns = countColumnsMap.get(columnIndex) + 1;
             int incrementedRaws = countRawsMap.get(rawIndex) + 1;
 
-            if(incrementedColumns >= mat.length || incrementedRaws >= mat[0].length) {
+            if (incrementedColumns >= mat.length || incrementedRaws >= mat[0].length) {
                 return i;
             }
 
@@ -65,7 +65,7 @@ public class Matrix {
                 }
             }
 
-            if(zeroOccurs) {
+            if (zeroOccurs) {
                 raw = raw.stream().map(integer -> {
                     return 0;
                 }).collect(Collectors.toList());
@@ -83,19 +83,65 @@ public class Matrix {
         });
     }
 
+    public static int numIslands(char[][] grid) {
+        int numOfIslands = 0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == '1') {
+                    grid[i][j] = 0;
+                    numOfIslands++;
+                    // check right neighbors
+                    checkNeighbor(grid, i, j + 1);
+                    // check down neighbors
+                    checkNeighbor(grid, i + 1, j);
+                }
+            }
+        }
+        return numOfIslands;
+    }
+
+    private static void checkNeighbor(char[][] grid, int i, int j) {
+        if (grid[i][j] == '1') {
+            grid[i][j] = 0;
+            // check right neighbors
+            if (j + 1 < grid[0].length) {
+                checkNeighbor(grid, i, j + 1);
+            }
+            // check down neighbors
+            if (i + 1 < grid.length) {
+                checkNeighbor(grid, i + 1, j);
+            }
+            // check left neighbors
+            if (j - 1 > 0) {
+                checkNeighbor(grid, i, j - 1);
+            }
+            // check down neighbors
+            if (i - 1 > 0) {
+                checkNeighbor(grid, i - 1, j);
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        int[][] arr = {{1, 2, 3},
-                       {4, 5, 6},
-                       {0, 1, 1},
-                       {4, 0, 5}};
-        setZeroes(arr);
-        printMatrix(arr);
+//        int[][] arr = {{1, 2, 3},
+//                       {4, 5, 6},
+//                       {0, 1, 1},
+//                       {4, 0, 5}};
+//        setZeroes(arr);
+//        printMatrix(arr);
+//
+//        String collect = Stream.of("1", "address")
+//                               .filter(Objects::nonNull)
+//                               .collect(Collectors.joining(" "));
+//
+//        System.out.println(collect);
+        char[][] array = {
+            {'1', '0', '1', '1', '1'},
+            {'1', '0', '1', '0', '1'},
+            {'1', '1', '1', '0', '1'}
+        };
 
-        String collect = Stream.of("1", "address")
-                               .filter(Objects::nonNull)
-                               .collect(Collectors.joining(" "));
-
-        System.out.println(collect);
+        System.out.println(numIslands(array));
     }
 
     public static void printMatrix(int[][] matrix) {

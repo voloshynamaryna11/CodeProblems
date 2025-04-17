@@ -1,6 +1,8 @@
 package org.example;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SlidingWindowExamples {
@@ -12,8 +14,8 @@ public class SlidingWindowExamples {
 //        IntStream.of(ints).boxed()
 //            .forEach(System.out::println);
 
-        int[] array = {1, 12, -5, -6, 50, 3};
-        System.out.println(findMaxAverage(array, 4));
+        int[] array = {2,3,1,2,4,3};
+        System.out.println(minSubArrayLen(7, array));
     }
 
     //Given array of positive/negative numbers. Need to return subsequence of this array with the biggest sum (the length of array could be whatever)
@@ -28,7 +30,7 @@ public class SlidingWindowExamples {
         int maxSum = sum;
 
         for (int i = 1; i < sequence.length; i++) {
-            if(sum < 0) {
+            if (sum < 0) {
                 startIndex = i;
                 length = 1;
                 sum = sequence[i];
@@ -37,28 +39,28 @@ public class SlidingWindowExamples {
                 sum += sequence[i];
             }
 
-            if(sum > maxSum) {
+            if (sum > maxSum) {
                 maxSum = sum;
                 bestStart = startIndex;
                 bestLength = length;
             }
         }
         return IntStream.of(sequence)
-            .skip(bestStart)
-            .limit(bestLength)
-            .toArray();
+                        .skip(bestStart)
+                        .limit(bestLength)
+                        .toArray();
     }
 
     //Для массива, состоящего из n целых чисел, найдите непрерывный подмассив заданной длины k, который имеет максимальное среднее значение. Нужно вывести максимальное среднее значение.
 
     public static double findMaxAverage(int[] array, int k) {
         int currentSum = IntStream.of(array).limit(k)
-            .sum();
+                                  .sum();
 
         int maxSum = currentSum;
 
         for (int i = k; i < array.length; i++) {
-                currentSum = currentSum + array[i] - array[i - k];
+            currentSum = currentSum + array[i] - array[i - k];
             maxSum = Math.max(currentSum, maxSum);
         }
 
@@ -98,12 +100,51 @@ public class SlidingWindowExamples {
         for (int i = 0; i < nums.length; i++) {
             if (nums[i] == 0 && nums.length - i >= 3) {
                 nums[i] = Math.abs(nums[i] - 1);
-                nums[i+1] = Math.abs(nums[i+1] - 1);
-                nums[i+2] = Math.abs(nums[i+2] - 1);
+                nums[i + 1] = Math.abs(nums[i + 1] - 1);
+                nums[i + 2] = Math.abs(nums[i + 2] - 1);
                 result++;
             }
         }
 
         return Arrays.stream(nums).anyMatch(v -> v == 0) ? -1 : result;
+    }
+
+    public static int minSubArrayLen(int target, int[] nums) {
+        int minLength = 0;
+        int currentLength = 1;
+        int currentStart = 0;
+        int currentEnd = 1;
+        int currentSum = nums[currentStart];
+
+        while (currentEnd <= nums.length && currentStart < nums.length) {
+            if (currentSum >= target) {
+                minLength = minLength == 0 ? currentLength : Math.min(minLength, currentLength);
+                currentSum -= nums[currentStart];
+                currentStart++;
+                currentLength--;
+            } else if (currentEnd < nums.length) {
+                if (minLength != 0 && currentLength + 1 >= minLength) {
+                    currentSum = currentSum + nums[currentEnd] - nums[currentStart];
+                    currentStart++;
+                    currentEnd++;
+                } else {
+                    currentSum += nums[currentEnd];
+                    currentEnd++;
+                    currentLength++;
+                }
+            } else {
+                return minLength;
+            }
+        }
+
+        return minLength;
+    }
+
+    public int maxp3(List<Integer> A) {
+        List<Integer> integers = A.stream()
+                                 .map(Math::abs)
+                                 .sorted(Integer::compareTo)
+                                 .collect(Collectors.toList());
+        return integers.get(integers.size() - 1)*integers.get(integers.size() - 2)*integers.get(integers.size() - 3);
     }
 }

@@ -1,6 +1,8 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DynamicProgramming {
@@ -49,7 +51,7 @@ public class DynamicProgramming {
         return max + 1;
     }
 
-//    You are climbing a staircase. It takes n steps to reach the top.
+    //    You are climbing a staircase. It takes n steps to reach the top.
 //
 //    Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
 //
@@ -104,11 +106,11 @@ public class DynamicProgramming {
             return (int) (Math.log(n) / Math.log(2)) + 1;
         }
 
-        if(n % 2 == 1) {
-            return 1 + minOperation(n -1);
+        if (n % 2 == 1) {
+            return 1 + minOperation(n - 1);
         }
 
-        return minOperation(n/2) + 1;
+        return minOperation(n / 2) + 1;
     }
 
     public static boolean isPowerOfTwo(int num) {
@@ -125,17 +127,53 @@ public class DynamicProgramming {
     //
     //Given the two integers m and n, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
     public static int uniquePaths(int m, int n) {
-        if(m == 1 && n == 1) {
+        if (m == 1 && n == 1) {
             return 1;
         }
-        if(m <= 0 || n <= 0) {
+        if (m <= 0 || n <= 0) {
             return 0;
         }
 
         return uniquePaths(m - 1, n) + uniquePaths(m, n - 1);
     }
 
+    // Given an integer A, how many structurally unique BST’s (binary search trees) exist that can store values 1…A?
+    public static int numTrees(int A) {
+        return calculateSum(A);
+    }
+
+    static int calculateSum(int currentAmount) {
+        if (currentAmount <= 1) {
+            return 1;
+        }
+
+        int sum = 0;
+        // Iterate over each possible root index
+        for (int i = 0; i < currentAmount; i++) {
+            // Left subtree has i nodes, right subtree has n-i-1 nodes
+            sum += calculateSum(i) * calculateSum(currentAmount - i - 1);
+        }
+        return sum;
+    }
+
+
+    public static long getWays(int n, List<Long> c) {
+       return calculateNumberOfWays(n, c, 0);
+    }
+
+    static int calculateNumberOfWays(long targetSum, List<Long> denominations, int amountOfWays) {
+        for (int i = 0; i < denominations.size(); i++) {
+            Long currentNumber = denominations.get(i);
+            if(targetSum % currentNumber == 0) amountOfWays++;
+
+            List<Long> currentDenominations = new ArrayList<>(denominations);
+            currentDenominations.remove(currentNumber);
+            amountOfWays += calculateNumberOfWays(targetSum - currentNumber, currentDenominations, amountOfWays);
+        }
+
+        return amountOfWays;
+    }
+
     public static void main(String[] args) {
-        System.out.println(uniquePaths(3, 7));
     }
 }

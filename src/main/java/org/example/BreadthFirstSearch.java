@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -76,6 +77,58 @@ public class BreadthFirstSearch {
             (treeNode.right == null) ? Math.max(treeNode.val, treeNode.val + leftPathMaxSum) : Math.max(treeNode.val, Math.max(treeNode.val + leftPathMaxSum, treeNode.val + rightPathMaxSum));
     }
 
+    // Given a binary tree, return the zigzag level order traversal of its nodes’ values. (ie, from left to right, then right to left for the next level and alternate between).
+    //
+    //Example :
+    //
+    //Given binary tree
+    //
+    //    3
+    //   / \
+    //  9  20
+    //    /  \
+    //   15   7
+    //return
+    //
+    //[
+    //         [3],
+    //         [20, 9],
+    //         [15, 7]
+    //]
+    public static int[][] zigzagLevelOrder(TreeNode A) {
+        List<List<Integer>> result = new ArrayList<>();
+
+        zigZag(result, false, A, new ArrayList<>());
+
+        return  result.stream()
+                      .map(innerList -> innerList.stream().mapToInt(Integer::intValue).toArray())
+                      .toArray(int[][]::new);
+    }
+
+    private static void zigZag(List<List<Integer>> result,  boolean forward, TreeNode currentNode, List<Integer> currentList) {
+        if(currentNode == null) {
+            return;
+        }
+
+        currentList.add(currentNode.val);
+        if(result.isEmpty()) {
+            result.add(currentList);
+        }
+
+        List<Integer> list = new ArrayList<>();
+        if(forward) {
+            zigZag(result, !forward, currentNode.left, list);
+            zigZag(result, !forward, currentNode.right, list);
+        } else {
+            zigZag(result, !forward, currentNode.right, list);
+            zigZag(result, !forward, currentNode.left, list);
+        }
+
+        if(!list.isEmpty()) {
+            result.add(list);
+        }
+    }
+
     private static class TreeNode implements Comparable<TreeNode> {
         int val;
         TreeNode left;
@@ -104,30 +157,15 @@ public class BreadthFirstSearch {
     }
 
     public static void main(String[] args) {
-//        TreeNode node4 = new TreeNode(4, null, null);
-//        TreeNode node5 = new TreeNode(5, null, null);
-//        TreeNode node6 = new TreeNode(6, null, null);
-//        TreeNode node7 = new TreeNode(7, null, null);
-//
-//        TreeNode node2 = new TreeNode(2, node4, node5);
-//        TreeNode node3 = new TreeNode(3, node6, node7);
-//
-//        TreeNode root = new TreeNode(1, node2, node3);
-//        breadthSearch(root);
+        TreeNode root = new TreeNode(3,
+                                     new TreeNode(9, null, null),
+                                     new TreeNode(20,
+                                                  new TreeNode(15, null, null),
+                                                  new TreeNode(7, null, null)
+                                     )
+        );
 
-        TreeNode node7 = new TreeNode(-1, null, null);  // index 7
-
-        // Middle layer
-        TreeNode node5 = new TreeNode(-2, null, null);  // index 5
-        TreeNode node4 = new TreeNode(3, null, null);   // index 4
-        TreeNode node3 = new TreeNode(1, node7, null);  // index 3
-
-        // Children of the root’s left and right
-        TreeNode node1 = new TreeNode(-2, node3, node4); // index 1
-        TreeNode node2 = new TreeNode(-3, node5, null);  // index 2
-
-        // Root
-        TreeNode root = new TreeNode(1, node1, node2);   // index 0
-        System.out.println(maxPathSum(root));
+        Arrays.stream(zigzagLevelOrder(root))
+            .forEach(System.out::println);
     }
 }

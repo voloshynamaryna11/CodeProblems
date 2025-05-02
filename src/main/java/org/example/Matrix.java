@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Matrix {
 
@@ -122,26 +120,176 @@ public class Matrix {
         }
     }
 
+    // The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+    //
+    //P   A   H   N
+    //A P L S I I G
+    //Y   I   R
+    //And then read line by line: "PAHNAPLSIIGYIR"
+    //
+    //Write the code that will take a string and make this conversion given a number of rows:
+    //
+    //string convert(string s, int numRows);
+    public static String convert(String s, int numRows) {
+        if (numRows <= 1) {
+            return s;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        String[] letters = s.split("");
+        List<Integer> listOfDifferences1 = new ArrayList<>();
+        List<Integer> listOfDifferences2 = new ArrayList<>();
+        for (int i = 0; i < numRows; i++) {
+            calculateRaw(i, letters, numRows, stringBuilder, listOfDifferences1, listOfDifferences2);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    static void calculateRaw(int startingLetterIndex, String[] letters, int numberOfRaws, StringBuilder changedString,
+                             List<Integer> listOfDifferences1, List<Integer> listOfDifferences2) {
+        if (startingLetterIndex == 0 || startingLetterIndex == numberOfRaws - 1) {
+            int differenceBetween2Indexes = numberOfRaws + (numberOfRaws - 3);
+            listOfDifferences1.add(differenceBetween2Indexes);
+            int currentSearchIndex = startingLetterIndex;
+            while (currentSearchIndex < letters.length) {
+                changedString.append(letters[currentSearchIndex]);
+                currentSearchIndex += differenceBetween2Indexes + 1;
+            }
+            return;
+        }
+        int differenceBetween2Indexes1 = listOfDifferences1.get(listOfDifferences1.size() - 1) - 2;
+        int differenceBetween2Indexes2 = listOfDifferences2.isEmpty() ? 1 : listOfDifferences2.get(listOfDifferences2.size() - 1) + 2;
+
+        int currentSearchIndex = startingLetterIndex;
+        boolean isUsedFirstDifference = false;
+        while (currentSearchIndex < letters.length) {
+            changedString.append(letters[currentSearchIndex]);
+            if (!isUsedFirstDifference) {
+                currentSearchIndex += differenceBetween2Indexes1 + 1;
+            } else {
+                currentSearchIndex += differenceBetween2Indexes2 + 1;
+            }
+            isUsedFirstDifference = !isUsedFirstDifference;
+        }
+        listOfDifferences1.add(differenceBetween2Indexes1);
+        listOfDifferences2.add(differenceBetween2Indexes2);
+    }
+
+    // Given N x N matrix filled with 0, 1, 2, 3.
+    //
+    //Find whether there is a path possible from source to destination, traversing through blank cells only.
+    //
+    //You can traverse up, down, right, and left. Return a single integer 1 if a path exists, otherwise 0.
+    //
+    //A value of cell 1 means Source.
+    //A value of cell 2 means Destination.
+    //A value of cell 3 means Blank cell.
+    //A value of cell 0 means Blank Wall.
+    //Note: there are an only a single source and single destination(sink).
+
+    public static int checkPath(int[][] A) {
+        for (int i = 0; i < A.length; i++) {
+            for (int j = 0; j < A[0].length; j++) {
+                if (A[i][j] == 1) {
+                    if (isPossibleToReachDestination(A, i, j, new ArrayList<>())) {
+                        return 1;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    private static boolean isPossibleToReachDestination(int[][] A, int currentI, int currentJ, List<Pair> visitedCells) {
+        visitedCells.add(new Pair(currentI, currentJ));
+        boolean leftCellIsPresent = currentJ - 1 >= 0;
+        boolean rightCellIsPresent = currentJ + 1 < A[0].length;
+        boolean upCellIsPresent = currentI - 1 >= 0;
+        boolean downCellIsPresent = currentI + 1 < A.length;
+
+        Pair leftCell = new Pair(currentI, currentJ - 1);
+        Pair rightCell = new Pair(currentI, currentJ + 1);
+        Pair upCell = new Pair(currentI - 1, currentJ);
+        Pair downCell = new Pair(currentI + 1, currentJ);
+
+        if ((rightCellIsPresent && A[rightCell.raw][rightCell.column] == 2)
+            || (leftCellIsPresent && A[leftCell.raw][leftCell.column] == 2)
+            || (downCellIsPresent && A[downCell.raw][downCell.column] == 2)
+            || (upCellIsPresent && A[upCell.raw][upCell.column] == 2)) {
+            return true;
+        }
+
+        if (rightCellIsPresent && A[rightCell.raw][rightCell.column] == 3 && !visitedCells.contains(rightCell)) {
+            if (isPossibleToReachDestination(A, currentI, currentJ + 1, visitedCells)) {
+                return true;
+            }
+            return isPossibleToReachDestination(A, currentI, currentJ, visitedCells);
+        }
+        if (leftCellIsPresent && A[leftCell.raw][leftCell.column] == 3 && !visitedCells.contains(leftCell)) {
+            if (isPossibleToReachDestination(A, currentI, currentJ - 1, visitedCells)) {
+                return true;
+            }
+            return isPossibleToReachDestination(A, currentI, currentJ, visitedCells);
+        }
+        if (downCellIsPresent && A[downCell.raw][downCell.column] == 3 && !visitedCells.contains(downCell)) {
+            if (isPossibleToReachDestination(A, currentI + 1, currentJ, visitedCells)) {
+                return true;
+            }
+            return isPossibleToReachDestination(A, currentI, currentJ, visitedCells);
+        }
+        if (upCellIsPresent && A[upCell.raw][upCell.column] == 3 && !visitedCells.contains(upCell)) {
+            if (isPossibleToReachDestination(A, currentI - 1, currentJ, visitedCells)) {
+                return true;
+            }
+            return isPossibleToReachDestination(A, currentI, currentJ, visitedCells);
+        }
+
+        return false;
+    }
+
+    static class Pair {
+        int raw;
+        int column;
+
+        public Pair(int raw, int column) {
+            this.raw = raw;
+            this.column = column;
+        }
+
+        public int getRaw() {
+            return raw;
+        }
+
+        public int getColumn() {
+            return column;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Pair pair)) {
+                return false;
+            }
+            return raw == pair.raw && column == pair.column;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(raw, column);
+        }
+    }
+
     public static void main(String[] args) {
-//        int[][] arr = {{1, 2, 3},
-//                       {4, 5, 6},
-//                       {0, 1, 1},
-//                       {4, 0, 5}};
-//        setZeroes(arr);
-//        printMatrix(arr);
-//
-//        String collect = Stream.of("1", "address")
-//                               .filter(Objects::nonNull)
-//                               .collect(Collectors.joining(" "));
-//
-//        System.out.println(collect);
-        char[][] array = {
-            {'1', '0', '1', '1', '1'},
-            {'1', '0', '1', '0', '1'},
-            {'1', '1', '1', '0', '1'}
+        int[][] matrix = {
+            {3, 3, 0, 0},
+            {0, 3, 2, 0},
+            {1, 3, 0, 0},
+            {3, 3, 3, 3}
         };
 
-        System.out.println(numIslands(array));
+        System.out.println(checkPath(matrix));
     }
 
     public static void printMatrix(int[][] matrix) {

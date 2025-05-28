@@ -10,9 +10,71 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class General {
+
+    // You will be given a square chess board with one queen and a number of obstacles placed on it. Determine how many squares the queen can attack.
+    public static int queensAttack(int n, int k, int r_q, int c_q, List<List<Integer>> obstacles) {
+        int sumOfColumnAndRaw = 2 * (n - 1);
+
+        int north = n - r_q;
+        int south = r_q - 1;
+        int east = n - c_q;
+        int west = c_q - 1;
+
+        int northEast = Math.min(north, east);
+        int northWest = Math.min(north, west);
+        int southEast = Math.min(south, east);
+        int southWest = Math.min(south, west);
+
+        for (int i = 0; i < obstacles.size(); i++) {
+            List<Integer> obstackle = obstacles.get(i);
+            Integer o_row = obstackle.get(0);
+            Integer o_column = obstackle.get(1);
+
+            int rawDiff = o_row - r_q;
+            int columnDiff = o_column - c_q;
+
+            if (o_row == r_q) {
+                if (columnDiff > 0) {
+                    east = Math.min(east, columnDiff - 1);
+                } else {
+                   west = Math.min(west, -columnDiff - 1);
+                }
+            } else if (o_column == c_q) {
+                if (rawDiff > 0) {
+                    north = Math.min(north, rawDiff - 1);
+                } else {
+                    south = Math.min(south, -rawDiff - 1);
+                }
+
+            } else if (Math.abs(rawDiff) == Math.abs(columnDiff)) {
+                if (rawDiff > 0 && columnDiff > 0) {
+                    //north_east
+                    northEast = Math.min(northEast, rawDiff - 1);
+                }
+
+                if (rawDiff < 0 && columnDiff < 0) {
+                    //south_west
+                    southWest = Math.min(southWest, -rawDiff - 1);
+                }
+
+                if (rawDiff > 0 && columnDiff < 0) {
+                    //north_west
+                    northWest = Math.min(northWest, rawDiff - 1);
+                }
+
+                if (rawDiff < 0 && columnDiff > 0) {
+                    //south_east
+                    southEast = Math.min(southEast, -rawDiff - 1);
+                }
+            }
+        }
+
+        return north + south + east + west + northEast + northWest + southEast + southWest;
+    }
 
     // Given an array of strings words and an integer k, return the k most frequent strings.
     //
@@ -40,7 +102,7 @@ public class General {
     }
 
     public static void main(String[] args) {
-        grayCode(3).stream().forEach(System.out::println);
+        System.out.println(queensAttack(4, 0, 4, 4, List.of(List.of())));
     }
 
     // We can use run-length encoding (i.e., RLE) to encode a sequence of integers. In a run-length encoded array of even length encoding (0-indexed), for all even i, encoding[i] tells us the number of times that the non-negative integer value encoding[i + 1] is repeated in the sequence.
@@ -199,4 +261,163 @@ public class General {
 
         return result;
     }
+
+    // Given a string A denoting an expression. It contains the following operators '+', '-', '*', '/'.
+    //
+    //Chech whether A has redundant braces or not.
+    //
+    //NOTE: A will be always a valid expression.
+    public static int braces(String A) {
+        Stack<String> strings = new Stack<>();
+
+        int lastOpenBraceIndex = -1;
+        String[] split = A.split("");
+        for (int i = 0; i < split.length; i++) {
+            if (Objects.equals(split[i], ")") && i - lastOpenBraceIndex == 2) {
+                return 1;
+            }
+            if (Objects.equals(split[i], "(")) {
+                lastOpenBraceIndex = i;
+                if (!strings.isEmpty() && strings.peek().equals(split[i]) && !checkForCloseBrace(split, i)) {
+                    return 1;
+                }
+                strings.push(split[i]);
+            }
+        }
+
+        return 0;
+    }
+
+    private static boolean checkForCloseBrace(String[] split, int currentElementIndex) {
+        int j = currentElementIndex;
+        while (split[j] != null && !split[j].equals(")")) {
+            j++;
+        }
+
+        return (j + 1 < split.length && (isOperation(split[j + 1]))) || (currentElementIndex - 1 >= 0 && (isOperation(
+            split[currentElementIndex - 1])));
+    }
+
+    private static boolean isOperation(String str) {
+        if (str.equals("*") ||
+            str.equals("+") ||
+            str.equals("-") ||
+            str.equals("/")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static TreeNode sortedListToBST(ListNode a) {
+        TreeNode root = new TreeNode(a.val);
+        a = a.next;
+
+        fillNode(root, a);
+
+        return root;
+    }
+
+    private static void fillNode(final TreeNode treeNode, ListNode partTobeAdded) {
+        if (partTobeAdded != null) {
+            TreeNode leftNode = new TreeNode(partTobeAdded.val);
+            treeNode.left = leftNode;
+        }
+
+        if (partTobeAdded.next != null) {
+            TreeNode right = new TreeNode(partTobeAdded.next.val);
+            treeNode.right = right;
+            partTobeAdded = partTobeAdded.next;
+        }
+
+        partTobeAdded = partTobeAdded.next;
+
+        if (partTobeAdded != null) {
+            ListNode halfOfListNode = getHalfOfListNode(partTobeAdded);
+            fillNode(treeNode.left, halfOfListNode);
+            if (partTobeAdded.next != null) {
+                ListNode listNode = deleteAllAfterCurrentNode(halfOfListNode, partTobeAdded);
+                fillNode(treeNode.right, listNode);
+            }
+        }
+    }
+
+    private static ListNode getHalfOfListNode(final ListNode listNode) {
+        ListNode usualIterator = listNode;
+        ListNode fastIterator = listNode;
+        while (fastIterator != null && fastIterator.next != null) {
+            usualIterator = usualIterator.next;
+            fastIterator = fastIterator.next.next;
+        }
+
+        return usualIterator;
+    }
+
+    private static ListNode deleteAllAfterCurrentNode(ListNode listNode, ListNode sequence) {
+        ListNode temp = sequence;
+        ListNode tempCopy = temp;
+        while (temp.next != listNode && temp != null) {
+            temp = temp.next;
+        }
+
+        if (temp != null && temp.next != null) {
+            temp.next = null;
+        }
+
+        return tempCopy;
+    }
+
+    public static void printTree(TreeNode root) {
+        int height = getHeight(root);
+        int width = (int) Math.pow(2, height) - 1;
+
+        String[][] res = new String[height][width];
+        for (String[] row : res) {
+            Arrays.fill(row, " ");
+        }
+
+        fill(res, root, 0, 0, width - 1);
+
+        for (String[] row : res) {
+            System.out.println(String.join("", row));
+        }
+    }
+
+    private static void fill(String[][] res, TreeNode node, int row, int left, int right) {
+        if (node == null) {
+            return;
+        }
+        int mid = (left + right) / 2;
+        res[row][mid] = String.valueOf(node.val);
+        fill(res, node.left, row + 1, left, mid - 1);
+        fill(res, node.right, row + 1, mid + 1, right);
+    }
+
+    private static int getHeight(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return 1 + Math.max(getHeight(root.left), getHeight(root.right));
+    }
+
+    //Extra classes section
+    static class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+
+        TreeNode(int x) {
+            val = x;
+        }
+    }
+
+    static class ListNode {
+        public int val;
+        public ListNode next;
+
+        ListNode(int x) {
+            val = x;
+            next = null;
+        }
+    }
 }
+

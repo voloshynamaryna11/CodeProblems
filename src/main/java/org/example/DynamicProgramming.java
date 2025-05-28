@@ -156,15 +156,16 @@ public class DynamicProgramming {
         return sum;
     }
 
-
     public static long getWays(int n, List<Long> c) {
-       return calculateNumberOfWays(n, c, 0);
+        return calculateNumberOfWays(n, c, 0);
     }
 
     static int calculateNumberOfWays(long targetSum, List<Long> denominations, int amountOfWays) {
         for (int i = 0; i < denominations.size(); i++) {
             Long currentNumber = denominations.get(i);
-            if(targetSum % currentNumber == 0) amountOfWays++;
+            if (targetSum % currentNumber == 0) {
+                amountOfWays++;
+            }
 
             List<Long> currentDenominations = new ArrayList<>(denominations);
             currentDenominations.remove(currentNumber);
@@ -174,6 +175,44 @@ public class DynamicProgramming {
         return amountOfWays;
     }
 
+    // Find the longest increasing subsequence of a given array of integers, A.
+    public static int lis(final List<Integer> A) {
+        int index = 0;
+        int maxLength = 0;
+        HashMap<Integer, Integer> map = new HashMap<>();
+
+        while (index < A.size() && maxLength < A.size() - index) {
+            maxLength = Math.max(maxLength, checkTheLongestSubsequenceForCurrentElement(index, A, map));
+            index++;
+        }
+
+        return maxLength;
+    }
+
+    private static int checkTheLongestSubsequenceForCurrentElement(int index, List<Integer> A, Map<Integer, Integer> alreadyCalculatedLengthes) {
+        if (index == A.size() - 1) {
+            return 1;
+        }
+
+        if(alreadyCalculatedLengthes.containsKey(index)) {
+            return alreadyCalculatedLengthes.get(index);
+        }
+
+
+        int maxSubsequenceLengthForCurrent = 1;
+        for (int i = index + 1; i < A.size(); i++) {
+            if(A.get(i) > A.get(index)) {
+                int sum = 1 + checkTheLongestSubsequenceForCurrentElement(i, A, alreadyCalculatedLengthes);
+                maxSubsequenceLengthForCurrent = Math.max(sum, maxSubsequenceLengthForCurrent);
+            }
+        }
+
+        alreadyCalculatedLengthes.put(index, maxSubsequenceLengthForCurrent);
+        return maxSubsequenceLengthForCurrent;
+    }
+
     public static void main(String[] args) {
+        List.of(1, 2, 1, 5);
+        System.out.println(lis(List.of(1, 2, 1, 5)));
     }
 }

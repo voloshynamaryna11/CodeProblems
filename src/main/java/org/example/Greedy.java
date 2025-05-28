@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -43,5 +44,36 @@ public class Greedy {
             .filter(i -> i < 0)
             .sorted(Integer::compareTo).limit(2)
             .reduce((a, b) -> a * b);
+    }
+
+    public static int mice(List<Integer> A, List<Integer> B) {
+        int result = 0;
+        List<Integer> copyB = new ArrayList<>(B);
+        for (int i =0; i < A.size(); i++) {
+            Integer integer = A.get(i);
+            Integer theClosestInteger = findTheClosestInteger(integer, copyB);
+            result = Math.max(result, Math.abs(integer - theClosestInteger));
+            copyB.remove(theClosestInteger);
+        }
+
+        return result;
+    }
+
+    private static int findTheClosestInteger(Integer integer, List<Integer> holes) {
+        int result = holes.get(0);
+        for (int i = 0; i < holes.size(); i++) {
+            if(Math.abs(holes.get(i) - integer) < Math.abs(result - integer)) {
+                result = holes.get(i);
+            }
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        List<Integer> integers = List.of(4, -4, 2);
+        List<Integer> integers1 = List.of(4, 0, 5);
+
+        System.out.println(mice(integers, integers1));
     }
 }
